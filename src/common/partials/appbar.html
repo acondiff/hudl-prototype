@@ -1,0 +1,49 @@
+<div id="appbar">
+    <div class="team-menu" dropdown>
+        <button dropdown-toggle class="menu-btn"><i class="material-icons left">apps</i> {{currentTeam}} <i class="material-icons right">arrow_drop_down</i></button>
+        <ul class="dropdown-menu">
+            <li ng-repeat="team in teams"><a href ng-click="updateCurrentTeam($index)">{{team}}</a></li>
+            <li class="divider"></li>
+            <li><a href>Add new team</a></li>
+        </ul>
+    </div>
+    <h2 class="logo">
+        <span class="logo-inside">
+            <img src="assets/images/logo.svg" alt="{{appMeta.name}}">
+        </span>
+    </h2>
+    <nav class="main-nav">
+        <ul>
+            <li><a href>Home</a></li>
+            <li><a href>Video</a></li>
+            <li><a href>Highlights</a></li>
+            <li class="active"><a href>Team</a></li>
+            <li><a href>Coaching Tools</a></li>
+        </ul>
+    </nav>
+    <div class="right-actions">
+         <div class="user-menu" dropdown>
+            <button dropdown-toggle class="menu-btn"><i class="material-icons left">account_circle</i> Coach Condiff <i class="material-icons right">arrow_drop_down</i></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li><a href>Account Settings</a></li>
+                <li><a href>Billing &amp; Invoices</a></li>
+                <li class="divider"></li>
+                <li><a href ng-click="logout()">Logout</a></li>
+            </ul>
+        </div>
+        <button class="message-btn"><i class="material-icons">email</i></button>
+        <div class="menu" dropdown>
+            <button dropdown-toggle class="menu-btn"><i class="material-icons">menu</i></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li><a href>News</a></li>
+                <li><a href>Help</a></li>
+                <li><a href>Activity</a></li>
+                <li><a href>View tutorials</a></li>
+                <li><a href>Submit a ticket</a></li>
+                <li><a href>Give us feedback</a></li>
+                <li><a href>Chat with someone</a></li>
+                <li><a href>Remote session</a></li>
+            </ul>
+        </div>                
+    </div>    
+</div>

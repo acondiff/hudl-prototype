@@ -1,0 +1,264 @@
+<div class="toolbar">
+    <h3>Manage Roster</h3>
+    <div class="search-wrap">
+        <div class="search">
+            <input type="text" placeholder="Search roster" id="roster-search" ng-model="rosterSearch">
+            <i class="material-icons search">search</i>
+            <i class="material-icons cancel" ng-if="rosterSearch" ng-click="clearRosterSearch($event)" ng-mousedown="rosterSearchMouseDown($event)">cancel</i>
+        </div>                
+    </div>
+    <div class="actions">
+        <button ng-click="deletePlayer()"><i class="material-icons">delete</i></button>
+        <button ng-click="printRoster()"><i class="material-icons">print</i></button>
+        <button><i class="material-icons">file_download</i></button>
+        <button ng-click="refreshData()"><i class="material-icons">refresh</i></button>
+        <button><i class="material-icons">more_vert</i></button>
+    </div>
+</div>
+<div class="roster-wrap">
+    <div class="sidebar">
+        <div class="add-player-menu" dropdown>
+                <button dropdown-toggle class="sb-btn">Add New Player</button>
+                <ul class="dropdown-menu">
+                    <li><a href ng-click="addNewPlayer()">Add new player</a></li>
+                    <li class="divider"></li>
+                    <li><a href>Import CV file</a></li>
+                </ul>
+            </div>
+        <div class="sb-select-list">
+            <h4>Seasons</h4>
+            <ul>
+                <li><a ng-class="{active: showAllSeasons === true}" ng-click="seasonsChange()" href>All Seasons</a></li>
+                <li ng-repeat="season in seasons | limitTo: (!seasonsMore) ? 4 : 100"><a ng-class="{active: season.on === true}" ng-click="seasonsChange($index)" href>{{season.year}} - {{season.year + 1}}</a></li>
+            </ul>
+            <a href class="action" ng-click="seasonsMore=!seasonsMore">
+                <span ng-if="!seasonsMore">More</span>
+                <span ng-if="seasonsMore">Less</span>
+            </a>
+        </div>
+        <div class="sb-multiselect-list">
+            <h4>Filter By Class</h4>
+            <ul>
+                <li ng-repeat="cls in gradClasses | limitTo: (!classesMore) ? 4 : 100"><input type="checkbox" ng-model="cls.on" ng-change="gradClassChange()" id="filter-{{cls.abbr}}"><label for="filter-{{cls.abbr}}">{{cls.name}}</label></li>
+            </ul>
+            <a href class="action" ng-click="classesMore=!classesMore">
+                <span ng-if="!classesMore">More</span>
+                <span ng-if="classesMore">Less</span>
+            </a>
+        </div>
+        <div class="sb-multiselect-list">
+            <h4>Filter By Position</h4>
+            <ul>
+                <li ng-repeat="position in positions | limitTo: (!positionsMore) ? 5 : 100"><input type="checkbox" ng-model="position.on" ng-change="positionChange()" id="filter-{{position.abbr}}"><label for="filter-{{position.abbr}}">{{position.name}}</label></li>
+            </ul>
+            <a href class="action" ng-click="positionsMore=!positionsMore">
+                <span ng-if="!positionsMore">More</span>
+                <span ng-if="positionsMore">Less</span>
+            </a>
+        </div>
+    </div>
+    <div class="roster-players-wrap">
+        <div class="player-list">
+            <div class="roster-header">
+                <div class="tr">
+                    <div class="td num" ng-click="rosterOrder('num')"># <span class="sortorder" ng-show="predicate === 'num'" ng-class="{reverse:reverse}"><i class="material-icons" ng-if="reverse">keyboard_arrow_down</i><i class="material-icons" ng-if="!reverse">keyboard_arrow_up</i></span></div>
+                    <div class="td name" ng-click="rosterOrder('name.last')">Name <span class="sortorder" ng-show="predicate === 'name.last'" ng-class="{reverse:reverse}"><i class="material-icons" ng-if="reverse">keyboard_arrow_down</i><i class="material-icons" ng-if="!reverse">keyboard_arrow_up</i></span></div>
+                    <div class="td email" ng-click="rosterOrder('email')">Email <span class="sortorder" ng-show="predicate === 'email'" ng-class="{reverse:reverse}"><i class="material-icons" ng-if="reverse">keyboard_arrow_down</i><i class="material-icons" ng-if="!reverse">keyboard_arrow_up</i></span></div>
+                    <div class="td height" ng-click="rosterOrder(['height.feet','height.inches'])">Height <span class="sortorder" ng-show="isArray(predicate)" ng-class="{reverse:reverse}"><i class="material-icons" ng-if="reverse">keyboard_arrow_down</i><i class="material-icons" ng-if="!reverse">keyboard_arrow_up</i></span></div>
+                    <div class="td weight" ng-click="rosterOrder('weight')">Weight <span class="sortorder" ng-show="predicate === 'weight'" ng-class="{reverse:reverse}"><i class="material-icons" ng-if="reverse">keyboard_arrow_down</i><i class="material-icons" ng-if="!reverse">keyboard_arrow_up</i></span></div>
+                    <div class="td class" ng-click="rosterOrder('gradYr')">Class <span class="sortorder" ng-show="predicate === 'gradYr'" ng-class="{reverse:reverse}"><i class="material-icons" ng-if="reverse">keyboard_arrow_down</i><i class="material-icons" ng-if="!reverse">keyboard_arrow_up</i></span></div>
+                    <div class="td positions">Positions</div>
+                    <div class="td activity">Last Activity</div>
+                </div>
+            </div>
+            <div class="roster-body-wrap" ng-keydown="keyPress($event)" tabindex="1">
+                <div class="roster-body">
+                    <div class="tr" ng-repeat="player in roster | filter: rosterSearch | filter: positionsFilter | filter: gradClassesFilter | filter: seasonsFilter | orderBy: predicate:reverse as filteredRoster track by player.id" ng-click="selectPlayerByIndex($index)" ng-hide="addingNewPlayer && player.id === activePlayer.id" ng-class="{selected: player.id === activePlayer.id}">
+                        <div class="td num">{{player.num}}{{(player.num) ? '' : '-'}}</div>
+                        <div class="td name">{{player.name.last}}{{(player.name.last && player.name.first)?', ':''}}{{player.name.first}}</div>
+                        <div class="td email">{{player.email}}{{(player.email) ? '' : '-'}}</div>
+                        <div class="td height">{{player.height.feet}}' {{player.height.inches}}"</div>
+                        <div class="td weight">{{player.weight}}{{player.weight ? ' lbs.' : '-'}}</div>
+                        <div class="td class">{{player.gradYr}} <span class="season-num">{{player.cls}}</span></div>
+                        <div class="td positions"><span ng-repeat="position in player.positions">{{position}}{{$last ? '' : ', '}}</span>{{(player.positions) ? '' : '-'}}</div>
+                        <div class="td activity">{{player.activity[0].time}} {{player.activity[0].time ? 'min on' : '-'}} {{player.activity[0].date}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="player-details" ng-class="{addingPlayer: addingNewPlayer===true}">
+            <div class="player-summary">
+                <div class="avatar" style="background-image:url({{activePlayer.avatarUrl}})"><i class="material-icons" ng-if="!activePlayer.avatarUrl">person</i></div>
+                <div class="info">
+                    <div class="name"><span class="num">{{activePlayer.num}}{{(!activePlayer.num && !activePlayer.num && !activePlayer.num && addingNewPlayer) ? 'Add New Player' : ''}}</span> {{activePlayer.name.last}}{{(activePlayer.name.last && activePlayer.name.first)?', ':''}}{{activePlayer.name.first}} <span class="cls" ng-if="activePlayer.cls">{{activePlayer.cls}}</span></div>
+                    <div class="pos"><span class="pos-txt">{{activePlayer.positionString}}</span></div>                  
+                </div>
+            </div>
+            <tabset>
+                <tab heading="Details" active="tabs[0].active" ng-click="gotoTab(0)">
+                    <div class="tab-pane-inside details-tab">
+                        <div class="details">
+                            <div class="row num">
+                                <div class="col-xs-5 data-label">Number</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="number" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.num">
+                                </div>
+                            </div>
+                            <div class="row fname">
+                                <div class="col-xs-5 data-label">First name</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.name.first">
+                                </div>
+                            </div>
+                            <div class="row lname">
+                                <div class="col-xs-5 data-label">Last name</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.name.last">
+                                </div>
+                            </div>
+                            <div class="row height">
+                                <div class="col-xs-5 data-label">Graduating class</div>
+                                <div class="col-xs-7 data-value">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <ui-select ng-model="activePlayer.gradYr" theme="selectize" ng-disabled="!editingPlayer">
+                                                <ui-select-match>{{$select.selected}}</ui-select-match>
+                                                <ui-select-choices repeat="g in gradYears | filter: $select.search">
+                                                    <span>{{g}}</span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row pos">
+                                <div class="col-xs-5 data-label">Position</div>
+                                <div class="col-xs-7 data-value">
+                                    <ui-select multiple ng-model="activePlayer.positions" theme="select2" ng-disabled="!editingPlayer">
+                                        <ui-select-match placeholder="Select positions">{{$item.abbr}}</ui-select-match>
+                                        <ui-select-choices repeat="position.abbr as position in positions"  >
+                                            {{position.name}}
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                            </div>
+                            <div class="row seasons">
+                                <div class="col-xs-5 data-label">Seasons</div>
+                                <div class="col-xs-7 data-value">
+                                    <ui-select multiple ng-model="activePlayer.seasons" theme="select2" ng-disabled="!editingPlayer">
+                                        <ui-select-match placeholder="Select positions">{{$item.year}}</ui-select-match>
+                                        <ui-select-choices repeat="season.year as season in seasons"  >
+                                            {{season.year}}
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+                            </div>
+                            <div class="row height">
+                                <div class="col-xs-5 data-label">Height</div>
+                                <div class="col-xs-7 data-value">
+                                    <div class="row">
+                                        <div class="col-xs-6" style="{{(!editingPlayer)?'  width: auto;':''}}">
+                                            <ui-select ng-model="activePlayer.height.feet" theme="selectize" ng-disabled="!editingPlayer">
+                                                <ui-select-match>{{$select.selected.label}}</ui-select-match>
+                                                <ui-select-choices repeat="f.val as f in feet | filter: $select.search">
+                                                  <span ng-bind="f.label"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <ui-select ng-model="activePlayer.height.inches" theme="selectize" ng-disabled="!editingPlayer">
+                                                <ui-select-match>{{$select.selected.label}}</ui-select-match>
+                                                <ui-select-choices repeat="i.val as i in inches | filter: $select.search">
+                                                  <span ng-bind="i.label"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row weight">
+                                <div class="col-xs-5 data-label">Weight</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="number" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.weight">
+                                </div>
+                            </div>
+                            <div class="row email">
+                                <div class="col-xs-5 data-label">Email</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-show="editingPlayer" ng-model="activePlayer.email">
+                                    <a href="mailto:{{activePlayer.email}}" ng-hide="editingPlayer">{{activePlayer.email}}</a>
+                                </div>
+                            </div>
+                            <div class="row mobile-phone">
+                                <div class="col-xs-5 data-label">Mobile phone</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.mphone">
+                                </div>
+                            </div>
+                            <div class="row home-phone">
+                                <div class="col-xs-5 data-label">Home phone</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.hphone">
+                                </div>
+                            </div>
+                            <div class="row street-address">
+                                <div class="col-xs-5 data-label">Street address</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.address.line1">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.address.line2">
+                                </div>
+                            </div>
+                            <div class="row city">
+                                <div class="col-xs-5 data-label">City</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.address.city">
+                                </div>
+                            </div>
+                            <div class="row state">
+                                <div class="col-xs-5 data-label">State</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="text" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.address.state">
+                                </div>
+                            </div>
+                            <div class="row zip">
+                                <div class="col-xs-5 data-label">Zip code</div>
+                                <div class="col-xs-7 data-value">
+                                    <input type="number" autocomplete="off" ng-disabled="!editingPlayer" ng-model="activePlayer.address.zip">
+                                </div>
+                            </div>
+                            <div class="row notes">
+                                <div class="col-xs-12">
+                                    <label class="data-label" for="player-notes">Notes</label>
+                                    <textarea id="player-notes" ng-blur="saveEditPlayer()" placeholder="Add a note" ng-model="activePlayer.notes"></textarea>
+                                </div>
+                            </div>
+                            <div class="row edit" ng-if="!editingPlayer">
+                                <div class="col-xs-12">
+                                    <button class="edit btn" ng-click="editPlayer()">Edit Player</button>
+                                </div>
+                            </div>
+                            <div class="row edit" ng-if="editingPlayer">
+                                <div class="col-xs-6">
+                                    <button class="edit cancel btn" ng-click="cancelEditPlayer()">Cancel</button>
+                                </div>
+                                <div class="col-xs-6" ng-if="!addingNewPlayer">
+                                    <button class="edit delete btn" ng-click="deletePlayer(activePlayer.id)">Delete</button>
+                                </div>
+                                <div class="col-xs-{{(addingNewPlayer) ? '6':'12'}}">
+                                    <button class="edit save btn" ng-click="saveEditPlayer()">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                <tab heading="Activity" active="tabs[1].active" ng-click="gotoTab(1)">
+                    <div class="tab-pane-inside activity-tab">
+                        <ul class="activity">
+                            <li ng-repeat="entry in activePlayer.activity">{{entry.time}} minutes on {{entry.date}}</li>
+                        </ul>
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>

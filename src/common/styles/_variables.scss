@@ -1,0 +1,57 @@
+$grid-gutter-width: 20px !default;
+$line-height-base: 1.5 !default;
+
+// Typography-related.
+$sansFontFamily: Roboto, sans-serif;
+
+// Colors
+$blue: #00b8f1;
+$turquoise: #0ACCA6;
+$green: #7ECC69;
+$yellow: #FFC033;
+$orange: #f87620;
+$red: #ED594A;
+$purple: #9C72B7;
+//$gray: #606063;
+$offWhite: #F5F7F7;
+
+$border-gray: #D9DFE0;
+
+$primaryColor: $orange;
+$primaryColorLight: lighten($primaryColor, 3%);
+$primaryColorDark: darken($primaryColor, 5%);
+
+$gray-darker:            #232a31;
+$gray-dark:              #2c373f;
+$gray:                   #394851;
+$gray-light:             #eff3f4;
+$gray-lighter:           #f4f6f6;
+
+$brand-primary:         $blue !default;
+$brand-success:         $green !default;
+$brand-info:            $purple !default;
+$brand-warning:         $yellow !default;
+$brand-danger:          $red !default;
+
+$bodyBgColor: #e5e5e5;
+
+$navWidth: 0;
+$navBgColor: $blue;
+$appbarColor: $gray-darker;
+$toolbarColor: $gray-dark;
+$sidebarWidth: 400px;
+
+$appbarHeight: 56px;
+$modulebarHeight: 60px;
+$toolbarHeight: 60px;
+
+$leftSidebarWidth: 250px;
+$rightSidebarWidth: 280px;
+
+$font-family: "Roboto", sans-serif;
+
+$line-height-base:        1.25 !default; // 20/14
+
+$border-radius-base:        2px !default;
+$border-radius-large:       3px !default;
+$border-radius-small:       1px !default;
