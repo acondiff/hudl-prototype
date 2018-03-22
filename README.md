@@ -5,10 +5,10 @@ Clone the repo
 
 Open terminal and navigate to the cloned directory
 
-`npm install'
+```npm install```
 
-'bower install'
+```bower install```
 
-'gulp'
+```gulp```
 
-In your browser go to localhost:3000
+In your browser go to `localhost:3000`
